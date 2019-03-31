@@ -24,6 +24,8 @@ services:
       context: services/mysql
       args:
         MYSQL_VERSION: latest
+    dns_search: labs
+    hostname: mysql.labs
     ports:
       - "3306:3306"
     environment:
@@ -40,6 +42,8 @@ services:
       context: services/postgres
       args:
         POSTGRES_VERSION: latest
+    dns_search: labs
+    hostname: postgres.labs
     ports:
       - "5432:5432"
     environment:
@@ -57,6 +61,8 @@ services:
       context: services/memcached
       args:
         MEMCACHED_VERSION: latest
+    dns_search: labs
+    hostname: memcached.labs
     ports:
       - "11211:11211"
     volumes:
@@ -70,6 +76,8 @@ services:
       context: services/redis
       args:
         REDIS_VERSION: latest
+    dns_search: labs
+    hostname: redis.labs
     command:
       - redis-server
       - /usr/local/etc/redis/redis.conf
@@ -88,6 +96,8 @@ services:
       context: services/consul
       args:
         CONSUL_VERSION: latest
+    dns_search: labs
+    hostname: consul.redis
     ports:
       - "8300:8300"
       - "8301:8301"
@@ -109,6 +119,8 @@ services:
       context: services/jenkins
       args:
         JENKINS_VERSION: lts
+    dns_search: labs
+    hostname: jenkins.labs
     ports:
       - "8080:8080"
     volumes:
@@ -123,6 +135,8 @@ services:
       context: services/gitlab
       args:
         GITLAB_VERSION: latest
+    dns_search: labs
+    hostname: gitlab.labs
     ports:
       - "8090:80"
       - "8091:443"
@@ -140,6 +154,8 @@ services:
       context: services/elasticsearch
       args:
         ELASTICSEARCH_VERSION: 6.5.0
+    dns_search: labs
+    hostname: elasticsearch.labs
     ports:
       - "9200:9200"
       - "9300:9300"
@@ -156,6 +172,8 @@ services:
       context: services/logstash/
       args:
         LOGSTASH_VERSION: 6.7.0
+    dns_search: labs
+    hostname: logstash.labs
     ports:
       - "5000:5000"
       - "9600:9600"
@@ -171,6 +189,8 @@ services:
       context: services/kibana
       args:
         KIBANA_VERSION: 6.5.0
+    dns_search: labs
+    hostname: kibana.labs
     ports:
       - "5601:5601"
     volumes:
@@ -188,6 +208,8 @@ services:
       context: services/grafana
       args:
         GRAFANA_VERSION: latest
+    dns_search: labs
+    hostname: grafana.labs
     ports:
       - "3000:3000"
     environment:
@@ -204,6 +226,8 @@ services:
       context: services/nginx
       args:
         NGINX_VERSION: latest
+    dns_search: labs
+    hostname: nginx.labs
     ports:
       - "80:80"
     volumes:
