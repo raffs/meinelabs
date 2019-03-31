@@ -12,6 +12,7 @@ volumes:
   storage-gitlab:
   storage-elasticsearch:
   storage-kibana:
+  storage-grafana:
 
 services:
 
@@ -178,6 +179,22 @@ services:
       - shared-logs:/usr/share/kibana/logs:rw
     depends_on:
       - elasticsearch
+
+  # ---------------------------------------------------------------------------
+  #  Grafana Service
+  # ---------------------------------------------------------------------------
+  grafana:
+    build:
+      context: services/grafana
+      args:
+        GRAFANA_VERSION: latest
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: meinelabs-passwd
+    volumes:
+      - storage-grafana:/var/lib/grafana:rw
+      - shared-logs:/var/log/grafana:rw
 
   # ---------------------------------------------------------------------------
   #  Nginx Service 
