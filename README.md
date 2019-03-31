@@ -28,6 +28,7 @@ Current this project contains the following services
 - elasticsearch
 - logstash
 - kibana
+- grafana
 
 You can start one service by running `docker-compose up -d <SERVICE_NAME> <SERVICE_NAME> ...`.
 The `docker-compose.yml` contains more information about the service definition, where you
