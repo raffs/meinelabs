@@ -1,0 +1,195 @@
+version: "3"
+
+volumes:
+  shared-logs:
+
+  # Per application services
+  storage-mysql:
+  storage-postgresql:
+  storage-redis:
+  storage-consul:
+  storage-jenkins:
+  storage-gitlab:
+  storage-elasticsearch:
+  storage-kibana:
+
+services:
+
+  # ---------------------------------------------------------------------------
+  #  MySQL Database 
+  # ---------------------------------------------------------------------------
+  mysql:
+    build:
+      context: services/mysql
+      args:
+        MYSQL_VERSION: latest
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: meinelabs-passwd
+    volumes:
+      - storage-mysql:/var/lib/mysql:rw
+      - shared-logs:/var/log/mysql:rw
+
+  # ---------------------------------------------------------------------------
+  #  PostgreSQL Database 
+  # ---------------------------------------------------------------------------
+  postgres:
+    build:
+      context: services/postgres
+      args:
+        POSTGRES_VERSION: latest
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: meinelabs-passwd
+    volumes:
+      - storage-postgresql:/var/lib/postgresql/:rw
+      - shared-logs:/var/logs/postgres:rw
+
+  # ---------------------------------------------------------------------------
+  #  Jenkins Service
+  # ---------------------------------------------------------------------------
+  memcached:
+    build:
+      context: services/memcached
+      args:
+        MEMCACHED_VERSION: latest
+    ports:
+      - "11211:11211"
+    volumes:
+      - shared-logs:/var/log/memcached:rw
+
+  # ---------------------------------------------------------------------------
+  #  Redis Service
+  # ---------------------------------------------------------------------------
+  redis:
+    build:
+      context: services/redis
+      args:
+        REDIS_VERSION: latest
+    command:
+      - redis-server
+      - /usr/local/etc/redis/redis.conf
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./services/redis/redis.conf:/usr/local/etc/redis/redis.conf:ro
+      - storage-redis:/data:rw 
+      - shared-logs:/var/log/redis:rw
+
+  # ---------------------------------------------------------------------------
+  #  Consul Service
+  # ---------------------------------------------------------------------------
+  consul:
+    build:
+      context: services/consul
+      args:
+        CONSUL_VERSION: latest
+    ports:
+      - "8300:8300"
+      - "8301:8301"
+      - "8302:8302/tcp"
+      - "8302:8302/udp"
+      - "8500:8500"
+      - "8600:8600/tcp"
+      - "8600:8600/udp"
+    volumes:
+      - ./services/consul/consul.json:/consul/config/consul.json:ro
+      - storage-consul:/consul/data:rw
+      - shared-logs:/var/log/consul:rw 
+
+  # ---------------------------------------------------------------------------
+  #  Jenkins Service
+  # ---------------------------------------------------------------------------
+  jenkins:
+    build:
+      context: services/jenkins
+      args:
+        JENKINS_VERSION: lts
+    ports:
+      - "8080:8080"
+    volumes:
+      - storage-jenkins:/var/jenkins_home:rw
+      - shared-logs:/mnt/logs:rw
+
+  # ---------------------------------------------------------------------------
+  #  Gitlab Service 
+  # ---------------------------------------------------------------------------
+  gitlab:
+    build:
+      context: services/gitlab
+      args:
+        GITLAB_VERSION: latest
+    ports:
+      - "8090:80"
+      - "8091:443"
+      - "8092:22"
+    volumes:
+      - storage-gitlab:/etc/gitlab:rw
+      - storage-gitlab://var/opt/gitlab:rw
+      - shared-logs:/var/log/gitlab:rw
+
+  # ---------------------------------------------------------------------------
+  #  Elasticsearch Service 
+  # ---------------------------------------------------------------------------
+  elasticsearch:
+    build:
+      context: services/elasticsearch
+      args:
+        ELASTICSEARCH_VERSION: 6.5.0
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    volumes:
+      - ./services/elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/elasticsearch.yml:ro
+      - storage-elasticsearch:/usr/share/elasticsearch/lib:rw
+      - shared-logs:/usr/share/elasticsearch/logs:rw
+
+  # ---------------------------------------------------------------------------
+  #  Logstash Service
+  # ---------------------------------------------------------------------------
+  logstash:
+    build:
+      context: services/logstash/
+      args:
+        LOGSTASH_VERSION: 6.7.0
+    ports:
+      - "5000:5000"
+      - "9600:9600"
+    volumes:
+      - ./services/logstash/logstash.yml:/usr/share/logstash/config/logstash.yml:ro
+      - ./services/logstash/pipeline:/usr/share/logstash/pipeline:ro
+
+  # ---------------------------------------------------------------------------
+  #  Kibana Service 
+  # ---------------------------------------------------------------------------
+  kibana:
+    build:
+      context: services/kibana
+      args:
+        KIBANA_VERSION: 6.5.0
+    ports:
+      - "5601:5601"
+    volumes:
+      - ./services/kibana/kibana.yml:/usr/share/kibana/kibana.yml:ro
+      - storage-kibana:/usr/share/kibana/lib:rw
+      - shared-logs:/usr/share/kibana/logs:rw
+    depends_on:
+      - elasticsearch
+
+  # ---------------------------------------------------------------------------
+  #  Nginx Service 
+  # ---------------------------------------------------------------------------
+  nginx:
+    build:
+      context: services/nginx
+      args:
+        NGINX_VERSION: latest
+    ports:
+      - "80:80"
+    volumes:
+      - ./services/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./services/nginx/conf.d:/etc/nginx/conf.d:rw
+      - shared-logs:/var/log/nginx:rw
