@@ -221,6 +221,22 @@ services:
       - influxdb
 
   # ---------------------------------------------------------------------------
+  #  Telegraf Service
+  # ---------------------------------------------------------------------------
+  telegraf:
+    build:
+      context: services/telegraf
+      args:
+        TELEGRAF_VERSION: latest
+    dns_search: labs
+    hostname: telegraf.labs
+    volumes:
+      - ./services/telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
+      - /var/run/docker.sock:/var/run/docker.sock:rw
+    depends_on:
+      - influxdb
+
+  # ---------------------------------------------------------------------------
   #  Kibana Service 
   # ---------------------------------------------------------------------------
   kibana:
