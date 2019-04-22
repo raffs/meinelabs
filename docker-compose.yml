@@ -321,3 +321,22 @@ services:
       - gitlab
       - kibana
       - grafana
+
+  # ---------------------------------------------------------------------------
+  #  Traefik Service
+  # ---------------------------------------------------------------------------
+  traefik:
+    build:
+      context: services/traefik
+      args:
+        TRAEFIK_VERSION: latest
+    dns_search: traefik.labs
+    hostname: traefik.labs
+    ports:
+      - "8781:80"
+      - "8782:8080"
+    command:
+      - "--api"
+      - "--docker"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:rw
