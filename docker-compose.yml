@@ -314,3 +314,10 @@ services:
       - ./services/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./services/nginx/conf.d:/etc/nginx/conf.d:rw
       - shared-logs:/var/log/nginx:rw
+    depends_on:
+      - chronograf
+      - elasticsearch
+      - jenkins
+      - gitlab
+      - kibana
+      - grafana
