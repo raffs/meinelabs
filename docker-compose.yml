@@ -6,13 +6,16 @@ volumes:
   # Per application services
   storage-mysql:
   storage-postgresql:
+  storage-influxdb:
   storage-redis:
   storage-consul:
   storage-jenkins:
   storage-gitlab:
   storage-elasticsearch:
+  storage-kapacitor:
   storage-kibana:
   storage-grafana:
+  storage-chronograf:
 
 services:
 
@@ -52,6 +55,24 @@ services:
     volumes:
       - storage-postgresql:/var/lib/postgresql/:rw
       - shared-logs:/var/logs/postgres:rw
+
+  # ---------------------------------------------------------------------------
+  #  InfluxDB Database
+  # ---------------------------------------------------------------------------
+  influxdb:
+    build:
+      context: services/influxdb
+      args:
+        INFLUXDB_VERSION: latest
+    dns_search: labs
+    hostname: influxdb.labs
+    ports:
+      - "8082:8082"
+      - "8088:8088"
+      - "8089:8089/udp"
+    volumes:
+      - ./services/influxdb/influxdb.conf:/etc/influxdb/influxdb.conf:ro
+      - storage-influxdb:/var/lib/influxdb:rw
 
   # ---------------------------------------------------------------------------
   #  Jenkins Service
@@ -182,6 +203,41 @@ services:
       - ./services/logstash/pipeline:/usr/share/logstash/pipeline:ro
 
   # ---------------------------------------------------------------------------
+  #  Kapacitor Service
+  # ---------------------------------------------------------------------------
+  kapacitor:
+    build:
+      context: services/kapacitor
+      args:
+        KAPACITOR_VERSION: latest
+    dns_search: labs
+    hostname: kapacitor.labs
+    ports:
+      - "9092:9092"
+    volumes:
+      - ./services/kapacitor/kapacitor.conf:/etc/kapacitor/kapacitor.conf:ro
+      - storage-kapacitor:/var/lig/kapacitor:rw
+      - shared-logs:/var/log/kapacitor:rw
+    depends_on:
+      - influxdb
+
+  # ---------------------------------------------------------------------------
+  #  Telegraf Service
+  # ---------------------------------------------------------------------------
+  telegraf:
+    build:
+      context: services/telegraf
+      args:
+        TELEGRAF_VERSION: latest
+    dns_search: labs
+    hostname: telegraf.labs
+    volumes:
+      - ./services/telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
+      - /var/run/docker.sock:/var/run/docker.sock:rw
+    depends_on:
+      - influxdb
+
+  # ---------------------------------------------------------------------------
   #  Kibana Service 
   # ---------------------------------------------------------------------------
   kibana:
@@ -217,6 +273,30 @@ services:
     volumes:
       - storage-grafana:/var/lib/grafana:rw
       - shared-logs:/var/log/grafana:rw
+
+  # ---------------------------------------------------------------------------
+  #  Chronograf Service
+  # ---------------------------------------------------------------------------
+  chronograf:
+    build:
+      context: services/chronograf
+      args:
+        CHRONOGRAF_VERSION: latest
+    dns_search: labs
+    hostname: crhonograf.labs
+    ports:
+      - "8888:8888"
+    command:
+      - chronograf
+      - "--port=8888"
+      - "--influxdb-url=http://influxdb:8086"
+      - "--kapacitor-url=http://kapacitor:9092"
+    volumes:
+      - storage-chronograf:/var/lib/chronograf:rw
+      - shared-logs:/var/log/chronograf:rw
+    depends_on:
+      - influxdb
+      - kapacitor
 
   # ---------------------------------------------------------------------------
   #  Nginx Service 
