@@ -314,3 +314,22 @@ services:
       - ./services/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./services/nginx/conf.d:/etc/nginx/conf.d:rw
       - shared-logs:/var/log/nginx:rw
+
+  # ---------------------------------------------------------------------------
+  #  Traefik Service
+  # ---------------------------------------------------------------------------
+  traefik:
+    build:
+      context: services/traefik
+      args:
+        TRAEFIK_VERSION: latest
+    dns_search: traefik.labs
+    hostname: traefik.labs
+    ports:
+      - "8781:80"
+      - "8782:8080"
+    command:
+      - "--api"
+      - "--docker"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:rw
