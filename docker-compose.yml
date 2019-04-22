@@ -15,6 +15,7 @@ volumes:
   storage-kapacitor:
   storage-kibana:
   storage-grafana:
+  storage-chronograf:
 
 services:
 
@@ -272,6 +273,30 @@ services:
     volumes:
       - storage-grafana:/var/lib/grafana:rw
       - shared-logs:/var/log/grafana:rw
+
+  # ---------------------------------------------------------------------------
+  #  Chronograf Service
+  # ---------------------------------------------------------------------------
+  chronograf:
+    build:
+      context: services/chronograf
+      args:
+        CHRONOGRAF_VERSION: latest
+    dns_search: labs
+    hostname: crhonograf.labs
+    ports:
+      - "8888:8888"
+    command:
+      - chronograf
+      - "--port=8888"
+      - "--influxdb-url=http://influxdb:8086"
+      - "--kapacitor-url=http://kapacitor:9092"
+    volumes:
+      - storage-chronograf:/var/lib/chronograf:rw
+      - shared-logs:/var/log/chronograf:rw
+    depends_on:
+      - influxdb
+      - kapacitor
 
   # ---------------------------------------------------------------------------
   #  Nginx Service 
