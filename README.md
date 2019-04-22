@@ -20,15 +20,19 @@ Current this project contains the following services
 
 - mysql
 - postgres
+- influxDB
 - memcached
 - redis
 - vault
 - jenkins
 - gitlab
 - elasticsearch
+- kapacitor
+- telegraf
 - logstash
 - kibana
 - grafana
+- chronograf
 
 You can start one service by running `docker-compose up -d <SERVICE_NAME> <SERVICE_NAME> ...`.
 The `docker-compose.yml` contains more information about the service definition, where you
