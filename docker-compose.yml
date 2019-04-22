@@ -6,6 +6,7 @@ volumes:
   # Per application services
   storage-mysql:
   storage-postgresql:
+  storage-influxdb:
   storage-redis:
   storage-consul:
   storage-jenkins:
@@ -52,6 +53,24 @@ services:
     volumes:
       - storage-postgresql:/var/lib/postgresql/:rw
       - shared-logs:/var/logs/postgres:rw
+
+  # ---------------------------------------------------------------------------
+  #  InfluxDB Database
+  # ---------------------------------------------------------------------------
+  influxdb:
+    build:
+      context: services/influxdb
+      args:
+        INFLUXDB_VERSION: latest
+    dns_search: labs
+    hostname: influxdb.labs
+    ports:
+      - "8082:8082"
+      - "8088:8088"
+      - "8089:8089/udp"
+    volumes:
+      - ./services/influxdb/influxdb.conf:/etc/influxdb/influxdb.conf
+      - storage-influxdb:/var/lib/influxdb:rw
 
   # ---------------------------------------------------------------------------
   #  Jenkins Service
