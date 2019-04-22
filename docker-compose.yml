@@ -12,6 +12,7 @@ volumes:
   storage-jenkins:
   storage-gitlab:
   storage-elasticsearch:
+  storage-kapacitor:
   storage-kibana:
   storage-grafana:
 
@@ -69,7 +70,7 @@ services:
       - "8088:8088"
       - "8089:8089/udp"
     volumes:
-      - ./services/influxdb/influxdb.conf:/etc/influxdb/influxdb.conf
+      - ./services/influxdb/influxdb.conf:/etc/influxdb/influxdb.conf:ro
       - storage-influxdb:/var/lib/influxdb:rw
 
   # ---------------------------------------------------------------------------
@@ -199,6 +200,25 @@ services:
     volumes:
       - ./services/logstash/logstash.yml:/usr/share/logstash/config/logstash.yml:ro
       - ./services/logstash/pipeline:/usr/share/logstash/pipeline:ro
+
+  # ---------------------------------------------------------------------------
+  #  Kapacitor Service
+  # ---------------------------------------------------------------------------
+  kapacitor:
+    build:
+      context: services/kapacitor
+      args:
+        KAPACITOR_VERSION: latest
+    dns_search: labs
+    hostname: kapacitor.labs
+    ports:
+      - "9092:9092"
+    volumes:
+      - ./services/kapacitor/kapacitor.conf:/etc/kapacitor/kapacitor.conf:ro
+      - storage-kapacitor:/var/lig/kapacitor:rw
+      - shared-logs:/var/log/kapacitor:rw
+    depends_on:
+      - influxdb
 
   # ---------------------------------------------------------------------------
   #  Kibana Service 
