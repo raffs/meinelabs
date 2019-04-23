@@ -33,6 +33,8 @@ Current this project contains the following services
 - kibana
 - grafana
 - chronograf
+- nginx
+- traefik
 
 You can start one service by running `docker-compose up -d <SERVICE_NAME> <SERVICE_NAME> ...`.
 The `docker-compose.yml` contains more information about the service definition, where you
