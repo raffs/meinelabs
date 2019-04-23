@@ -2,8 +2,8 @@
 
 Meine labs is a variaty of infrastructure and devops-like tools running on
 docker containers in order to be used as development and/or testing environment.
-Whether you want to test new technologies, create a local instance of the services for
-testing or you want to use to learn about this services, and how they maybe be
+Whether you want to test new technologies, create a local instance for
+testing or you want to learn about these services, and how they might be
 integrated with each other.
 
 ## Minimal Configuration
