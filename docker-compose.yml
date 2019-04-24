@@ -16,6 +16,7 @@ volumes:
   storage-kibana:
   storage-grafana:
   storage-chronograf:
+  storage-nexus3:
 
 services:
 
@@ -166,6 +167,23 @@ services:
       - storage-gitlab:/etc/gitlab:rw
       - storage-gitlab://var/opt/gitlab:rw
       - shared-logs:/var/log/gitlab:rw
+
+  # ---------------------------------------------------------------------------
+  #  Nexus3 Service
+  #  Default credentials is: admin / admin123
+  # ---------------------------------------------------------------------------
+  nexus3:
+    build:
+      context: services/nexus3
+      args:
+        NEXUS3_VERSION: latest
+    dns_search: labs
+    hostname: nexus3.labs
+    ports:
+      - "8081:8081"
+    volumes:
+      - storage-nexus3:/nexus-data:rw
+      - shared-logs:/opt/sonartype/nexus/logs:rw
 
   # ---------------------------------------------------------------------------
   #  Elasticsearch Service 
