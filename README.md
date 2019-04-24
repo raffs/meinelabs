@@ -26,6 +26,7 @@ Current this project contains the following services
 - vault
 - jenkins
 - gitlab
+- nexus3
 - elasticsearch
 - kapacitor
 - telegraf
