@@ -143,6 +143,23 @@ services:
         JENKINS_VERSION: lts
     dns_search: labs
     hostname: jenkins.labs
+    environment:
+      JENKINS_OPTS: >
+        --httpPort=8080
+        --httpsPort=-1
+      JAVA_OPTS: >
+        -Xloggc:/mnt/logs/gc-%t.log
+        -XX:NumberOfGCLogFiles=5
+        -XX:+UseGCLogFileRotation
+        -XX:GCLogFileSize=20m
+        -XX:+PrintGC
+        -XX:+PrintGCDateStamps
+        -XX:+PrintGCDetails
+        -XX:+PrintHeapAtGC
+        -XX:+PrintGCCause
+        -XX:+PrintTenuringDistribution
+        -XX:+PrintReferenceGC
+        -XX:+PrintAdaptiveSizePolicy
     ports:
       - "8080:8080"
     volumes:
