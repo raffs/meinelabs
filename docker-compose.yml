@@ -10,6 +10,7 @@ volumes:
   storage-redis:
   storage-consul:
   storage-jenkins:
+  storage-drone:
   storage-gitlab:
   storage-elasticsearch:
   storage-kapacitor:
@@ -148,6 +149,36 @@ services:
     volumes:
       - storage-jenkins:/var/jenkins_home:rw
       - shared-logs:/mnt/logs:rw
+
+  # ---------------------------------------------------------------------------
+  #  Drone.io Service
+  #
+  #   Drone requires a source control management system, such as gitlab
+  #   or github. Due to our environment we requires gitlab to install and
+  #   setup drone.io
+  # ---------------------------------------------------------------------------
+  drone:
+    build:
+      context: services/drone
+      args:
+        DRONE_VERSION: 1
+    dns_search: labs
+    hostname: drone.labs
+    environment:
+      DRONE_RUNNER_CAPACITY: 5
+      DRONE_SERVER_HOST: drone.labs:8083
+      #DRONE_GITLAB_CLIENT_ID: app-id-goes-here
+      #DRONE_GITLAB_CLIENT_SECRET: secret-goes-here
+      #DRONE_GITLAB_SERVER: http://gitlab:8090/
+    ports:
+      - "8083:80"
+      - "8084:443"
+    volumes:
+      - storage-drone:/var/lib/drone:rw
+      - shared-logs:/mnt/logs:rw
+      - /var/run/docker.sock:/var/run/docker.sock:rw 
+    depends_on:
+      - gitlab
 
   # ---------------------------------------------------------------------------
   #  Gitlab Service 

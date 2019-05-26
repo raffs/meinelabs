@@ -1,0 +1,3 @@
+ARG DRONE_VERSION
+
+FROM drone/drone:${DRONE_VERSION}
